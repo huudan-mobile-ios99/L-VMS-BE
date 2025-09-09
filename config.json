@@ -1,0 +1,4 @@
+{
+  "webrtcUrl": "ws://192.168.101.169:3333/app/stream",
+  "visible": true
+}
