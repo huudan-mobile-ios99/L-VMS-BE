@@ -1,0 +1,52 @@
+DOCS TO run docker and OBS To start stream in PC View
+
+ docker ps  | check list container running
+ docker rm ome (remove container ome )
+ docker restart ome
+ docker stop ome
+ docker run -d --name ome -p 1935:1935 -p 3333:3333 -p 8080:8080 -p 9000:9000 -p 10000-10050:10000-10050/udp airensoft/ovenmediaengine:latest         (run 2 container ome for live stream)
+
+
+
+docker run --name ome -d -e OME_HOST_IP=192.168.101.169 -p 1935:1935 -p 9999:9999/udp -p 9000:9000 -p 3333:3333 -p 3478:3478 -p 10000-10009:10000-10009/udp -v ome-origin-conf:/opt/ovenmediaengine/bin/origin_conf -v ome-edge-conf:/opt/ovenmediaengine/bin/edge_conf airensoft/ovenmediaengine:latest
+
+
+
+
+
+MEDIA PLAYER OVEN
+http://192.168.101.169:8090/     (view)
+
+START VIEW by Nodejs
+
+
+
+
+
+cd to edit server.xml config of ome
+
+cd /opt/ovenmediaengine/bin/origin_conf
+ls
+
+
+
+Copy the file out:
+
+docker cp ome:/opt/ovenmediaengine/bin/origin_conf/Server.xml .\
+
+
+Open in Notepad (this works because now it’s on Windows, not inside Docker):
+
+notepad .\Server.xml
+
+
+Make your changes → Save.
+
+Copy back into the container:
+
+docker cp .\Server.xml ome:/opt/ovenmediaengine/bin/origin_conf/Server.xml
+
+
+Restart the container:
+
+docker restart ome

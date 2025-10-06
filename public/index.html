@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WebRTC Live Stream</title>
+  <title>WebRTC Live Stream 1</title>
   <script src="https://cdn.jsdelivr.net/npm/ovenplayer/dist/ovenplayer.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.0/dist/socket.io.min.js"></script>
   <style>
@@ -32,57 +32,61 @@
   <div id="hiddenMessage">🔒 Stream is hidden by admin</div>
 
   <script>
-    let playerInstance = null;
+  let playerInstance = null;
 
-    async function initPlayer() {
-      const res = await fetch("/api/config");
-      const config = await res.json();
-      updateVisibility(config.visible, config.webrtcUrl);
+  // Helper: get ?code=... from URL
+  function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  }
+
+  async function initPlayer() {
+    const code = getQueryParam("code");
+    if (!code) {
+      document.getElementById("hiddenMessage").innerText = "❌ Missing code in URL";
+      document.getElementById("hiddenMessage").style.display = "block";
+      return;
     }
 
-    function updateVisibility(visible, webrtcUrl) {
-      const playerDiv = document.getElementById("player");
-      const hiddenMessage = document.getElementById("hiddenMessage");
+    const res = await fetch(`/api/stream/init?code=${code}`);
+    const data = await res.json();
 
-      if (!visible) {
-        if (playerInstance) {
-          playerInstance.remove(); // Remove player if it exists
-          playerInstance = null;
-        }
-        playerDiv.style.display = "none";
-        hiddenMessage.style.display = "block";
-      } else {
-        hiddenMessage.style.display = "none";
-        playerDiv.style.display = "block";
-        if (!playerInstance) {
-          playerInstance = OvenPlayer.create("player", {
-            sources: [{
-              type: "webrtc",
-              file: webrtcUrl
-            }],
-            autoStart: true,
-            controls: true
-          });
-        }
+    if (!data.success) {
+      document.getElementById("hiddenMessage").innerText = "❌ " + (data.message || "Invalid code");
+      document.getElementById("hiddenMessage").style.display = "block";
+      return;
+    }
+
+    // If success, init OvenPlayer with streamUrl
+    updateVisibility(true, data.streamUrl);
+  }
+
+  function updateVisibility(visible, webrtcUrl) {
+    const playerDiv = document.getElementById("player");
+    const hiddenMessage = document.getElementById("hiddenMessage");
+
+    if (!visible) {
+      if (playerInstance) {
+        playerInstance.remove();
+        playerInstance = null;
+      }
+      playerDiv.style.display = "none";
+      hiddenMessage.style.display = "block";
+    } else {
+      hiddenMessage.style.display = "none";
+      playerDiv.style.display = "block";
+      if (!playerInstance) {
+        playerInstance = OvenPlayer.create("player", {
+          sources: [{ type: "webrtc", file: webrtcUrl }],
+          autoStart: true,
+          controls: true
+        });
       }
     }
+  }
 
-    // Initialize Socket.IO client
-    const socket = io();
-
-    // Listen for visibility updates from the server
-    socket.on("visibilityUpdate", (visible) => {
-      fetch("/api/config").then(res => res.json()).then(config => {
-        updateVisibility(visible, config.webrtcUrl);
-      });
-    });
-    socket.on("refreshPage", () => {
-    console.log("Received refresh signal, reloading page...");
-    location.reload();
-    });
-
-    // Initialize the player on page load
-    initPlayer();
-  </script>
+  // Init on load
+  initPlayer();
+</script>
 </body>
 </html>
