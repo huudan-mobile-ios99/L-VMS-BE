@@ -6,15 +6,15 @@ const { Server } = require("socket.io");
 const path = require("path");
 
 const { connectDBLVMS } = require("./config_mongo");
-const userRoutes = require("./routes/userRoutes");
+const userRoutes = require("./routes/customerRoutes");
 const streamRoutes = require("./routes/streamRoutes");
 
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] }
 });
-
 // Make io available to routes via middleware
 app.use((req, res, next) => {
   req.io = io;
@@ -31,8 +31,8 @@ app.use(cors({ origin: "*" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // API Routes
-app.use("/api/user", userRoutes);       // ✅ User routes
-app.use("/api/stream", streamRoutes);   // ✅ Stream routes
+app.use("/api/customer", userRoutes);       // ✅ User routes
+// app.use("/api/stream", streamRoutes);   // ✅ Stream routes
 
 // Start server
 const PORT = process.env.PORT || 8081;

@@ -31,12 +31,14 @@
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.2",
     "mongoose-sequence": "^6.0.1",
+    "net": "^1.0.2",
     "nodemon": "^3.1.4",
     "path": "^0.12.7",
     "qrcode": "^1.5.4",
     "request-ip": "^3.3.0",
     "socket.io": "^4.8.1",
     "useragent": "^2.3.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "ws": "^8.18.3"
   }
 }

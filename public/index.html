@@ -1,92 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WebRTC Live Stream 1</title>
+  <meta charset="UTF-8" />
+  <title>OvenMediaEngine Live Stream</title>
   <script src="https://cdn.jsdelivr.net/npm/ovenplayer/dist/ovenplayer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.0/dist/socket.io.min.js"></script>
   <style>
     html, body {
       margin: 0;
       padding: 0;
+      background: #000;
       height: 100%;
       width: 100%;
-      background: #000;
-      overflow: hidden;
     }
     #player {
       width: 100%;
       height: 100%;
-    }
-    #hiddenMessage {
-      display: none;
-      color: white;
-      font-size: 2rem;
-      text-align: center;
-      padding-top: 20%;
+      background: #000;
     }
   </style>
 </head>
 <body>
   <div id="player"></div>
-  <div id="hiddenMessage">🔒 Stream is hidden by admin</div>
 
   <script>
-  let playerInstance = null;
+    // Replace this with your actual WebSocket stream link
+    const streamUrl = "ws://192.168.101.169:3333/app/stream";
 
-  // Helper: get ?code=... from URL
-  function getQueryParam(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-  }
+    const player = OvenPlayer.create("player", {
+      sources: [
+        {
+          type: "webrtc",
+          file: streamUrl
+        }
+      ],
+      autoStart: true,
+      controls: true,
+      mute: false
+    });
 
-  async function initPlayer() {
-    const code = getQueryParam("code");
-    if (!code) {
-      document.getElementById("hiddenMessage").innerText = "❌ Missing code in URL";
-      document.getElementById("hiddenMessage").style.display = "block";
-      return;
-    }
+    // Optional logging for debugging
+    player.on("error", (err) => {
+      console.error("OvenPlayer Error:", err);
+    });
 
-    const res = await fetch(`/api/stream/init?code=${code}`);
-    const data = await res.json();
-
-    if (!data.success) {
-      document.getElementById("hiddenMessage").innerText = "❌ " + (data.message || "Invalid code");
-      document.getElementById("hiddenMessage").style.display = "block";
-      return;
-    }
-
-    // If success, init OvenPlayer with streamUrl
-    updateVisibility(true, data.streamUrl);
-  }
-
-  function updateVisibility(visible, webrtcUrl) {
-    const playerDiv = document.getElementById("player");
-    const hiddenMessage = document.getElementById("hiddenMessage");
-
-    if (!visible) {
-      if (playerInstance) {
-        playerInstance.remove();
-        playerInstance = null;
-      }
-      playerDiv.style.display = "none";
-      hiddenMessage.style.display = "block";
-    } else {
-      hiddenMessage.style.display = "none";
-      playerDiv.style.display = "block";
-      if (!playerInstance) {
-        playerInstance = OvenPlayer.create("player", {
-          sources: [{ type: "webrtc", file: webrtcUrl }],
-          autoStart: true,
-          controls: true
-        });
-      }
-    }
-  }
-
-  // Init on load
-  initPlayer();
-</script>
+    player.on("stateChanged", (state) => {
+      console.log("Player state changed:", state);
+    });
+  </script>
 </body>
 </html>

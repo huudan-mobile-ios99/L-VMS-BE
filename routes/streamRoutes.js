@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../model/user");
+const User = require("../model/customer");
 const fs = require("fs");
+const WebSocket = require("ws");
+
 
 // Load config.json
 function loadConfig() {
@@ -34,7 +36,7 @@ router.get("/init", async (req, res) => {
     // If valid + canview=true
     res.json({
       success: true,
-      streamUrl: "ws://192.168.101.169:3333/app/stream",
+      streamUrl: "ws://192.168.101.169:3334/app/stream",
       player: "ovenplayer",
     });
   } catch (err) {
@@ -69,5 +71,9 @@ router.post("/url", (req, res) => {
   fs.writeFileSync("config.json", JSON.stringify(config, null, 2));
   res.json({ success: true, config });
 });
+
+
+
+
 
 module.exports = router;
