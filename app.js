@@ -5,9 +5,12 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 
-const { connectDBLVMS } = require("./config_mongo");
-const userRoutes = require("./routes/customerRoutes");
+const { connectDBLVMS } = require("./configurationDB/config_mongo");
+const customerRoutes = require("./routes/customerRoutes");
 const streamRoutes = require("./routes/streamRoutes");
+const viewRoutes = require("./routes/viewRoutes");
+const linkRoutes = require("./routes/linkRoutes");
+const machineRoutes = require("./routes/machineRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -31,12 +34,19 @@ app.use(cors({ origin: "*" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // API Routes
-app.use("/api/customer", userRoutes);       // ✅ User routes
-// app.use("/api/stream", streamRoutes);   // ✅ Stream routes
+app.use("/api/view", viewRoutes);
+app.use("/api/customer", customerRoutes);       // ✅ User routes
+app.use("/api/link", linkRoutes);               // ✅ Link routes
 
+//this is machine online status when inserted card
+app.use("/api/machine", machineRoutes);         // ✅ machine routes
 // Start server
 const PORT = process.env.PORT || 8081;
 server.listen(PORT, async () => {
   await connectDBLVMS();
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+
+//run The CronJOB
+require('./configurationDB/cronjob');

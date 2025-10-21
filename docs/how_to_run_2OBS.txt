@@ -20,7 +20,7 @@ docker run --name ome -d -e OME_HOST_IP=192.168.101.169 -p 1935:1935 -p 8081:808
 
 OBS settings
 1. rtmp://192.168.101.169:1935/app (key:stream)
-ws://192.168.101.169:3333/app/stream (webview )
+ws://192.168.101.169:3333/app/stream (webview)
 
 2.rtmp://192.168.101.169:1940/app (key:stream)
 ws://192.168.101.169:3340/app/stream
